@@ -6,77 +6,108 @@
     <title>2027 Device Roadmap</title>
     <style>
         :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --accent: #38bdf8;
-            --accent-green: #34d399;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --border: #334155;
+            --bg-color: #f5f5f7;
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --text-main: #1d1d1f;
+            --text-muted: #86868b;
+            --accent: #0071e3;
+            --accent-hover: #0077ed;
+            --border: rgba(0, 0, 0, 0.08);
+            --green: #34c759;
+            --shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #000000;
+                --card-bg: rgba(28, 28, 30, 0.8);
+                --text-main: #f5f5f7;
+                --text-muted: #a1a1a6;
+                --accent: #2997ff;
+                --accent-hover: #147ce5;
+                --border: rgba(255, 255, 255, 0.12);
+                --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+            }
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro JP", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
         }
 
         body {
             background-color: var(--bg-color);
             color: var(--text-main);
-            padding: 16px;
-            max-width: 600px;
+            padding: 24px 16px;
+            max-width: 560px;
             margin: 0 auto;
-            padding-bottom: 40px;
+            padding-bottom: 60px;
+            transition: background 0.3s ease;
         }
 
         h1 {
-            font-size: 1.5rem;
-            margin-bottom: 16px;
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 24px;
             text-align: center;
-            color: var(--accent);
+            letter-spacing: -0.01em;
         }
 
+        /* サマリーカード */
         .summary-card {
             background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 16px;
+            border-radius: 20px;
+            padding: 20px;
             margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .summary-item {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            box-shadow: var(--shadow);
             text-align: center;
         }
 
         .summary-item .label {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--text-muted);
             margin-bottom: 4px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
         }
 
         .summary-item .val {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: var(--accent-green);
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-main);
         }
 
+        .summary-item.highlight .val {
+            color: var(--accent);
+        }
+
+        /* 追加フォーム */
         .add-form {
             background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 20px;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
         }
 
         .add-form h2 {
-            font-size: 1.1rem;
-            margin-bottom: 12px;
-            color: var(--accent);
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 14px;
+            color: var(--text-main);
         }
 
         .input-group {
@@ -85,33 +116,43 @@
             gap: 10px;
         }
 
-        input, select {
+        input {
             width: 100%;
-            padding: 10px 12px;
-            border-radius: 8px;
+            padding: 12px 14px;
+            border-radius: 12px;
             border: 1px solid var(--border);
-            background: #0f172a;
+            background: rgba(120, 120, 128, 0.06);
             color: var(--text-main);
             font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15);
         }
 
         button.btn-add {
             width: 100%;
             padding: 12px;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             background: var(--accent);
-            color: #0f172a;
-            font-weight: bold;
-            font-size: 1rem;
+            color: #ffffff;
+            font-weight: 500;
+            font-size: 0.95rem;
             cursor: pointer;
-            margin-top: 6px;
+            transition: background 0.2s, transform 0.1s;
+            margin-top: 4px;
         }
 
         button.btn-add:active {
-            opacity: 0.8;
+            transform: scale(0.98);
+            background: var(--accent-hover);
         }
 
+        /* リスト表示 */
         .item-list {
             display: flex;
             flex-direction: column;
@@ -120,32 +161,35 @@
 
         .item-card {
             background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 14px;
+            border-radius: 16px;
+            padding: 16px;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            box-shadow: var(--shadow);
+            transition: opacity 0.2s;
         }
 
         .item-card.purchased {
             opacity: 0.5;
+        }
+
+        .item-card.purchased .item-title {
             text-decoration: line-through;
         }
 
         .item-left {
             display: flex;
             align-items: center;
-            gap: 12px;
-        }
-
-        .item-icon {
-            font-size: 1.5rem;
+            gap: 14px;
         }
 
         .item-title {
-            font-weight: bold;
-            font-size: 1rem;
+            font-weight: 600;
+            font-size: 0.95rem;
             margin-bottom: 2px;
         }
 
@@ -158,45 +202,54 @@
             text-align: right;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
 
         .item-price {
-            font-weight: bold;
-            color: var(--accent-green);
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text-main);
         }
 
         .btn-delete {
             background: none;
             border: none;
-            color: #ef4444;
-            font-size: 1.1rem;
+            color: #ff3b30;
+            font-size: 1rem;
             cursor: pointer;
-            padding: 4px;
+            padding: 6px;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .btn-delete:hover {
+            opacity: 1;
         }
 
         input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
+            width: 22px;
+            height: 22px;
             cursor: pointer;
+            accent-color: var(--accent);
+            border-radius: 6px;
         }
     </style>
 </head>
 <body>
 
-    <h1>📱 2027 Device Roadmap</h1>
+    <h1>Device Roadmap</h1>
 
     <!-- 自動計算エリア -->
     <div class="summary-card">
         <div class="summary-item">
-            <div class="label">全デバイス数</div>
-            <div class="val" id="total-count">0 件</div>
+            <div class="label">アイテム</div>
+            <div class="val" id="total-count">0件</div>
         </div>
         <div class="summary-item">
             <div class="label">購入済み</div>
-            <div class="val" id="bought-count">0 件</div>
+            <div class="val" id="bought-count">0件</div>
         </div>
-        <div class="summary-item">
+        <div class="summary-item highlight">
             <div class="label">合計金額</div>
             <div class="val" id="total-price">¥0</div>
         </div>
@@ -204,7 +257,7 @@
 
     <!-- 追加フォーム -->
     <div class="add-form">
-        <h2>➕ 新しいデバイスを追加</h2>
+        <h2>新規デバイスを追加</h2>
         <div class="input-group">
             <input type="text" id="name-input" placeholder="デバイス名 (例: iPad mini 7)" required>
             <input type="text" id="date-input" placeholder="時期 (例: 2027年 春)">
@@ -217,17 +270,15 @@
     <div class="item-list" id="item-list"></div>
 
     <script>
-        // デフォルトデータ（初回のみ使用）
         const defaultItems = [
             { id: 1, name: "iPhone 18 Pro", date: "2026年 秋", price: 180000, bought: false },
             { id: 2, name: "MacBook Air M4", date: "2027年 春", price: 160000, bought: false }
         ];
 
-        // ローカルストレージからデータ取得、なければデフォルトをセット
-        let items = JSON.parse(localStorage.getItem('device_roadmap_items')) || defaultItems;
+        let items = JSON.parse(localStorage.getItem('apple_device_roadmap')) || defaultItems;
 
         function saveData() {
-            localStorage.setItem('device_roadmap_items', JSON.stringify(items));
+            localStorage.setItem('apple_device_roadmap', JSON.stringify(items));
         }
 
         function render() {
@@ -253,15 +304,14 @@
                     </div>
                     <div class="item-right">
                         <div class="item-price">¥${Number(item.price).toLocaleString()}</div>
-                        <button class="btn-delete" onclick="deleteItem(${item.id})">🗑️</button>
+                        <button class="btn-delete" onclick="deleteItem(${item.id})">✕</button>
                     </div>
                 `;
                 listEl.appendChild(card);
             });
 
-            // 集計データの更新
-            document.getElementById('total-count').innerText = `${items.length} 件`;
-            document.getElementById('bought-count').innerText = `${boughtCount} 件`;
+            document.getElementById('total-count').innerText = `${items.length}件`;
+            document.getElementById('bought-count').innerText = `${boughtCount}件`;
             document.getElementById('total-price').innerText = `¥${totalPrice.toLocaleString()}`;
         }
 
@@ -287,7 +337,6 @@
             saveData();
             render();
 
-            // フォームのリセット
             nameEl.value = '';
             dateEl.value = '';
             priceEl.value = '';
@@ -313,7 +362,6 @@
             });
         }
 
-        // 初回描画
         render();
     </script>
 </body>
