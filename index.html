@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0b0b0d" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Device Ecosystem Roadmap 2026–2027</title>
+<style>
+/* ==========================================================================
+   FONTS
+   Uses only system fonts so the page works fully offline — no network
+   request is made for typefaces. Apple platforms already ship SF Pro
+   (matched here by -apple-system) and SF Mono (ui-monospace).
+   ========================================================================== */
+
+/* ==========================================================================
+   DESIGN TOKENS — Light theme (default)
+   ========================================================================== */
+:root{
+  /* Text */
+  --ink: #0b0b0d;
+  --ink-soft: #47474d;
+  --ink-faint: #6d6d73;
+  --ink-on-accent: #ffffff;
+
+  /* Surfaces */
+  --bg-base: #f4f5f7;
+  --glass: rgba(255,255,255,0.72);
+  --glass-strong: rgba(255,255,255,0.90);
+  --line: rgba(0,0,0,0.10);
+  --line-strong: rgba(0,0,0,0.18);
+  --shadow-color: rgba(0,0,0,0.08);
+
+  /* Accents */
+  --blue: #0a84ff;
+  --indigo: #5e5ce6;
+  --pink: #ff375f;
+  --amber: #b8690a;
+  --green: #26a349;
+
+  /* Static tint/shadow tokens (avoids color-mix() for older Safari/WebKit support) */
+  --tint-05: rgba(0,0,0,0.05);
+  --ring-blue: rgba(10,132,255,0.18);
+  --ring-blue-0: rgba(10,132,255,0);
+  --shadow-blue: rgba(10,132,255,0.35);
+  --amber-bg: rgba(184,105,10,0.12);
+  --amber-border: rgba(184,105,10,0.3);
+  --blob-blue: rgba(10,132,255,0.14);
+  --blob-indigo: rgba(94,92,230,0.12);
+  --blob-pink: rgba(255,55,95,0.09);
+  --blob-amber: rgba(184,105,10,0.10);
+  --celebrate-blue: rgba(10,132,255,0.10);
+  --celebrate-pink: rgba(255,55,95,0.08);
+
+  /* Radii */
+  --r-lg: 28px;
+  --r-md: 20px;
+  --r-sm: 14px;
+
+  /* Motion */
+  --ease: cubic-bezier(.16,.84,.44,1);
+  --dur-fast: .25s;
+  --dur-med: .5s;
+  --dur-slow: 1s;
+}
+
+/* Dark theme: mirrors the light palette 1:1 so every component "just works" */
+@media (prefers-color-scheme: dark){
+  :root{
+    --ink: #f5f5f7;
+    --ink-soft: #c7c7cc;
+    --ink-faint: #8e8e93;
+
+    --bg-base: #0b0b0d;
+    --glass: rgba(255,255,255,0.06);
+    --glass-strong: rgba(255,255,255,0.10);
+    --line: rgba(255,255,255,0.10);
+    --line-strong: rgba(255,255,255,0.18);
+    --shadow-color: rgba(0,0,0,0.45);
+
+    --blue: #409cff;
+    --indigo: #7d7aff;
+    --pink: #ff6482;
+    --amber: #e2a03f;
+    --green: #43c463;
+
+    --tint-05: rgba(255,255,255,0.07);
+    --ring-blue: rgba(64,156,255,0.22);
+    --ring-blue-0: rgba(64,156,255,0);
+    --shadow-blue: rgba(64,156,255,0.4);
+    --amber-bg: rgba(226,160,63,0.14);
+    --amber-border: rgba(226,160,63,0.32);
+    --blob-blue: rgba(64,156,255,0.16);
+    --blob-indigo: rgba(125,122,255,0.14);
+    --blob-pink: rgba(255,100,130,0.10);
+    --blob-amber: rgba(226,160,63,0.12);
+    --celebrate-blue: rgba(64,156,255,0.12);
+    --celebrate-pink: rgba(255,100,130,0.10);
+  }
+}
+
+/* Respect reduced-motion preference across the whole page */
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior:auto !important; }
+}
+
+/* ==========================================================================
+   ICON SYSTEM (inline SVG <use>, replaces emoji for a consistent look)
+   ========================================================================== */
+.check-icon svg, .device-icon svg, .acc-icon svg{
+  width: 60%; height: 60%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.check-icon, .device-icon, .acc-icon{ color: var(--ink-soft); }
+
+/* ==========================================================================
+   RESET & BASE
+   ========================================================================== */
+*, *::before, *::after{ box-sizing:border-box; margin:0; padding:0; }
+html{ scroll-behavior:smooth; }
+
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Arial,sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(1000px 560px at 10% -10%, var(--blob-blue), transparent 60%),
+    radial-gradient(900px 560px at 100% 0%,  var(--blob-indigo), transparent 55%),
+    radial-gradient(800px 520px at 92% 60%,  var(--blob-pink), transparent 55%),
+    radial-gradient(800px 560px at 0% 95%,   var(--blob-amber), transparent 55%),
+    var(--bg-base);
+  background-attachment: fixed;
+  line-height: 1.5;
+  transition: background-color var(--dur-med) var(--ease), padding-top var(--dur-med) var(--ease);
+}
+body.nav-visible{ padding-top: 48px; }
+
+img, svg{ display:block; max-width:100%; }
+button{ font: inherit; }
+
+:focus-visible{
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+.skip-link{
+  position:absolute; left:-9999px; top:0; z-index:999;
+  background: var(--blue); color:#fff; padding:12px 20px; border-radius:0 0 10px 0;
+  font-weight:700; text-decoration:none;
+}
+.skip-link:focus{ left:0; }
+
+.scroll-progress{
+  position: fixed; top:0; left:0; right:0; height:3px;
+  z-index: 1000; background: transparent;
+}
+.scroll-progress-fill{
+  height:100%; width:0%;
+  background: linear-gradient(90deg, var(--blue), var(--indigo), var(--pink));
+  transition: width .1s linear;
+}
+
+.site-nav{
+  position: fixed; top:3px; left:0; right:0; z-index: 900;
+  background: var(--glass-strong);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid var(--line);
+  opacity: 0; transform: translateY(-100%);
+  transition: opacity var(--dur-med) var(--ease), transform var(--dur-med) var(--ease);
+  pointer-events: none;
+}
+.site-nav.is-visible{ opacity:1; transform: translateY(0); pointer-events: auto; }
+.site-nav-inner{
+  max-width: 900px; margin:0 auto; padding: 0 20px;
+  display:flex; gap: 4px; overflow-x:auto;
+  scrollbar-width: none;
+}
+.site-nav-inner::-webkit-scrollbar{ display:none; }
+.site-nav-inner a{
+  flex-shrink:0;
+  font-size: 12.5px; font-weight:700; color: var(--ink-faint);
+  text-decoration:none; padding: 14px 12px; white-space:nowrap;
+  border-bottom: 2px solid transparent;
+  transition: color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
+}
+.site-nav-inner a:hover{ color: var(--ink); }
+.site-nav-inner a.is-active{ color: var(--blue); border-color: var(--blue); }
+
+.wrap{ max-width: 900px; margin: 0 auto; padding: 0 20px; }
+section{ padding: 88px 0; scroll-margin-top: 64px; }
+
+.eyebrow{
+  font-family:ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace;
+  font-size: 11.5px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase;
+  color: var(--blue);
+  display:flex; align-items:center; gap:10px; margin-bottom:16px;
+}
+.eyebrow::before{ content:''; width:22px; height:1.5px; background: var(--blue); }
+
+.section-title{ font-size: clamp(26px,4.2vw,34px); font-weight:800; letter-spacing:-0.02em; margin-bottom: 12px; }
+.section-sub{ color: var(--ink-soft); font-size: 15px; font-weight:500; max-width:56ch; margin-bottom:40px; }
+
+.glass{
+  background: var(--glass);
+  backdrop-filter: blur(26px) saturate(180%);
+  -webkit-backdrop-filter: blur(26px) saturate(180%);
+  border: 1px solid var(--line);
+  box-shadow: 0 12px 40px var(--shadow-color);
+  transition: transform var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease), background-color var(--dur-med) var(--ease), border-color var(--dur-med) var(--ease);
+}
+.rounded-lg{ border-radius: var(--r-lg); }
+.rounded-md{ border-radius: var(--r-md); }
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))){
+  .glass{ background: var(--glass-strong); }
+}
+
+.liftable:hover{ transform: translateY(-3px); box-shadow: 0 18px 46px var(--shadow-color); }
+
+.fade-in{
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity var(--dur-slow) var(--ease), transform var(--dur-slow) var(--ease);
+}
+.fade-in.in-view{ opacity: 1; transform: translateY(0); }
+
+.hero{ padding: 96px 0 60px; }
+.hero-title{
+  font-size: clamp(38px,8vw,58px);
+  font-weight: 900; letter-spacing:-0.035em; line-height:1.08;
+  margin-bottom: 18px;
+}
+.hero-title .accent{ color: var(--blue); }
+.hero-sub{
+  font-size: 17px; color: var(--ink-soft); font-weight:500;
+  max-width: 50ch; margin-bottom: 40px; line-height:1.75;
+}
+.hero-stats{ display:flex; gap:14px; flex-wrap:wrap; }
+.hero-stat{ flex:1; min-width:150px; padding: 22px 22px 20px; }
+.hero-stat .k{ font-family:ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace; font-size:10.5px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:10px; }
+.hero-stat .v{ font-size: 25px; font-weight:800; letter-spacing:-0.01em; }
+.hero-stat .v span{ font-size:14px; color:var(--ink-faint); font-weight:600; }
+
+.year-track{ display:grid; grid-template-columns: 1fr; gap:16px; }
+.year-col{ padding: 26px 22px 24px; position:relative; overflow:hidden; }
+.year-col::before{ content:''; position:absolute; top:0; left:0; right:0; height:4px; background: var(--yc); }
+.year-num{ font-size: 30px; font-weight:900; letter-spacing:-0.02em; margin-bottom:4px; }
+.year-tag{ font-family:ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace; font-size:10.5px; font-weight:700; color:var(--yc); letter-spacing:0.08em; text-transform:uppercase; margin-bottom:20px; }
+.year-item{ display:flex; align-items:flex-start; gap:10px; padding:10px 0; border-top:1px solid var(--line); transition: opacity var(--dur-fast) var(--ease); }
+.year-item:first-of-type{ border-top:none; padding-top:0; }
+.year-dot{ width:8px; height:8px; border-radius:50%; background:var(--yc); margin-top:6px; flex-shrink:0; }
+.year-item-name{ font-size:13.5px; font-weight:700; line-height:1.4; }
+.year-item-price{ font-size:11.5px; color:var(--ink-faint); font-weight:600; margin-top:2px; font-family:ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace; }
+.year-item.is-done .year-item-name{ text-decoration: line-through; opacity:.55; }
+
+.budget-grid{ display:grid; grid-template-columns: repeat(3,1fr); gap:14px; }
+.budget-tile{ padding: 22px 18px; text-align:center; }
+.budget-tile .k{ font-family:ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace; font-size:10px; font-weight:700; letter-spacing:0.09em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:10px; }
+.budget-tile .v{ font-size:20px; font-weight:800; font-family:ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace; letter-spacing:-0.01em; }
+.budget-tile.accent .v{ color: var(--blue); }
+
+.progress-wrap{ padding: 46px 34px 40px; }
+.progress-track{ position:relative; height:6px; border-radius:6px; background: var(--line-strong); margin: 34px 6px 0; overflow:hidden; }
+.progress-fill{
+  position:absolute; left:0; top:0; height:100%; width: 0%;
+  border-radius:6px;
+  background: linear-gradient(90deg, var(--blue), var(--indigo));
+  transition: width var(--dur-slow) var(--ease);
+}
+.progress-labels{ display:flex; justify-content:space-between; margin-top: -3px; }
+.p-mark{ display:flex; flex-direction:column; align-items:center; gap:10px; width: 80px; }
+.p-mark .p-dot{ width:16px; height:16px; border-radius:50%; background: var(--bg-base); border:3px solid var(--line-strong); transition: all var(--dur-fast) var(--ease); }
+.p-mark.active .p-dot{ border-color: var(--blue); background: var(--blue); box-shadow: 0 0 0 5px var(--ring-blue); }
+.p-mark .p-pct{ font-family:ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace; font-size:12px; font-weight:700; color:var(--ink-faint); transition: color var(--dur-fast) var(--ease); }
+.p-mark.active .p-pct{ color: var(--blue); }
+.p-mark .p-label{ font-size:11px; color:var(--ink-faint); font-weight:600; text-align:center; }
+.progress-next{ text-align:center; margin-top: 30px; font-size:13px; font-weight:700; color: var(--ink-soft); }
+.progress-next .highlight{ color: var(--blue); }
+
+.checklist{ display:grid; grid-template-columns: repeat(2,1fr); gap:14px; }
+.checklist-summary{
+  font-family:ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace; font-size:12.5px; font-weight:700;
+  color: var(--blue); letter-spacing:0.04em; margin: -18px 0 22px;
+}
+.checklist-summary .sub{ color: var(--ink-faint); font-weight:600; }
+.check-item{
+  display:flex; align-items:center; gap:14px;
+  padding: 18px 20px; border-radius: var(--r-md);
+  cursor:pointer; position:relative;
+}
+.check-icon{
+  width:38px; height:38px; border-radius:11px; flex-shrink:0;
+  background: var(--tint-05);
+  display:flex; align-items:center; justify-content:center; font-size:18px;
+  transition: transform var(--dur-fast) var(--ease);
+}
+.check-input:checked ~ .check-icon{ transform: scale(1.08); }
+.check-input{
+  position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+  overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+}
+.check-box-visual{
+  width:26px; height:26px; border-radius:8px; flex-shrink:0;
+  border: 2px solid var(--line-strong);
+  background: var(--bg-base);
+  display:flex; align-items:center; justify-content:center;
+  transition: background-color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+}
+.check-box-visual::after{
+  content:'✓'; color:#fff; font-size:15px; font-weight:800; line-height:1;
+  opacity:0; transform: scale(.5); transition: all var(--dur-fast) var(--ease);
+}
+.check-input:checked ~ .check-box-visual{ background: var(--item-color, var(--blue)); border-color: var(--item-color, var(--blue)); }
+.check-input:checked ~ .check-box-visual::after{ opacity:1; transform: scale(1); }
+.check-input:focus-visible ~ .check-box-visual{ outline: 2px solid var(--blue); outline-offset: 3px; }
+.check-name{ font-size:14.5px; font-weight:700; transition: opacity var(--dur-fast) var(--ease); }
+.status-badge{
+  display:inline-block; font-size: 9.5px; font-weight:800; letter-spacing:0.03em;
+  padding: 2px 7px; border-radius: 20px; margin-left: 4px; vertical-align: 2px;
+}
+.status-badge.confirmed{ color: var(--green); background: var(--tint-05); border: 1px solid var(--green); }
+.status-badge.pending{ color: var(--ink-faint); background: var(--tint-05); border: 1px solid var(--line-strong); }
+.check-meta{ font-size:11.5px; color:var(--ink-faint); font-weight:600; margin-top:2px; }
+.check-caveat{ display:block; font-size:10.5px; color:var(--ink-faint); font-weight:500; margin-top:3px; opacity:0.85; }
+.check-input:checked ~ .check-content .check-name{ text-decoration: line-through; opacity:.55; }
+
+.celebrate{
+  text-align:center; padding: 56px 24px;
+  background: linear-gradient(160deg, var(--celebrate-blue), var(--celebrate-pink));
+}
+.celebrate[hidden]{ display:none; }
+.celebrate-section{ padding: 0; }
+.celebrate-section.is-visible{ padding: 88px 0; }
+.celebrate-emoji{ font-size: 44px; margin-bottom: 14px; animation: celebrate-pop .6s var(--ease); }
+@keyframes celebrate-pop{ 0%{ transform: scale(.4); opacity:0; } 60%{ transform: scale(1.15); opacity:1; } 100%{ transform: scale(1); } }
+.celebrate-title{ font-size: clamp(24px,4.5vw,32px); font-weight:900; letter-spacing:-0.02em; margin-bottom:10px; }
+.celebrate-sub{ color: var(--ink-soft); font-size:14.5px; font-weight:500; }
+
+.network-card{ padding: 40px 24px 36px; text-align:center; }
+.hub-node{ display:inline-flex; flex-direction:column; align-items:center; gap:8px; margin-bottom: 22px; }
+.hub-icon{
+  width:72px; height:72px; border-radius:22px;
+  background: var(--glass-strong); border: 2px solid var(--ink);
+  display:flex; align-items:center; justify-content:center;
+  box-shadow: 0 12px 30px var(--shadow-color), 0 0 0 0 var(--ring-blue);
+  animation: hub-pulse 2.6s var(--ease) infinite;
+}
+.hub-icon svg{ width:56%; height:56%; fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; color: var(--ink); }
+@keyframes hub-pulse{
+  0%, 100%{ box-shadow: 0 12px 30px var(--shadow-color), 0 0 0 0 var(--ring-blue); }
+  50%{ box-shadow: 0 12px 30px var(--shadow-color), 0 0 0 10px var(--ring-blue-0); }
+}
+.hub-label{ font-size: 15px; font-weight:800; }
+.hub-sublabel{ font-size: 11px; font-weight:600; color: var(--ink-faint); }
+.hub-connector{ width:2px; height:28px; margin: 0 auto 22px; background: linear-gradient(to bottom, var(--ink), transparent); opacity: 0.35; }
+.spoke-grid{ display:grid; grid-template-columns: repeat(4, 1fr); gap: 12px; max-width: 640px; margin: 0 auto; }
+.spoke-item{
+  display:flex; flex-direction:column; align-items:center; gap:8px;
+  padding: 16px 8px; border-radius: var(--r-md);
+  background: var(--glass-strong); border: 1px solid var(--nc, var(--line));
+}
+.spoke-icon{ width:44px; height:44px; border-radius:14px; background: var(--tint-05); display:flex; align-items:center; justify-content:center; }
+.spoke-icon svg{ width:58%; height:58%; fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; color: var(--nc, var(--ink)); }
+.spoke-label{ font-size: 11.5px; font-weight:700; line-height:1.3; }
+
+.compare{ display:grid; grid-template-columns: 1fr auto 1fr; align-items:center; gap:20px; }
+.compare-col{ padding: 30px 26px; }
+.compare-title{ font-family:ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace; font-size:11px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; margin-bottom: 20px; }
+.compare-title.now{ color: var(--ink-faint); }
+.compare-title.after{ color: var(--blue); }
+.compare-row{ display:flex; align-items:center; gap:10px; padding:9px 0; border-top:1px solid var(--line); font-size:13.5px; font-weight:600; }
+.compare-row:first-of-type{ border-top:none; padding-top:0; }
+.compare-row.dim{ opacity:0.55; }
+.compare-arrow{
+  width:52px; height:52px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  background: linear-gradient(135deg, var(--blue), var(--indigo));
+  color:#fff; font-size:22px; font-weight:700;
+  box-shadow: 0 10px 26px var(--shadow-blue); flex-shrink:0;
+}
+.disposal-note{ margin-top: 18px; padding: 18px 20px; display:flex; align-items:flex-start; gap:14px; }
+.disposal-icon{ width:38px; height:38px; border-radius:11px; background: var(--tint-05); display:flex; align-items:center; justify-content:center; color: var(--ink-soft); }
+.disposal-title{ font-size: 13.5px; font-weight:800; margin-bottom: 8px; }
+.disposal-list{ list-style:none; display:flex; flex-direction:column; gap:8px; }
+.disposal-list li{ font-size: 12.5px; color: var(--ink-soft); font-weight:500; line-height:1.6; padding-left: 14px; position:relative; }
+.disposal-list li::before{ content:''; position:absolute; left:0; top:8px; width:5px; height:5px; border-radius:50%; background: var(--ink-faint); }
+
+.acc-note{
+  display:inline-flex; align-items:center; gap:8px;
+  font-family:ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace; font-size:11.5px; font-weight:700;
+  color: var(--amber); background: var(--amber-bg); border:1px solid var(--amber-border);
+  padding:7px 14px; border-radius:20px; margin-bottom:28px;
+}
+.acc-grid{ display:grid; grid-template-columns: repeat(3,1fr); gap:12px; }
+.acc-item{ padding: 20px 16px; display:flex; flex-direction:column; align-items:center; gap:10px; text-align:center; }
+.acc-icon{ font-size:24px; width:48px; height:48px; border-radius:14px; background: var(--tint-05); display:flex; align-items:center; justify-content:center; }
+.acc-name{ font-size:12.5px; font-weight:700; line-height:1.3; }
+.acc-timing{ font-size:10.5px; color:var(--ink-faint); font-weight:600; }
+
+.device-grid{ display:grid; grid-template-columns: repeat(2,1fr); gap:12px; }
+.device-card{ padding: 18px 16px; display:flex; align-items:center; gap:13px; }
+.device-icon{ width:44px; height:44px; border-radius:13px; background: var(--tint-05); display:flex; align-items:center; justify-content:center; font-size:21px; flex-shrink:0; }
+.device-name{ font-size:14px; font-weight:700; line-height:1.3; }
+.device-role{ font-size:11.5px; color:var(--ink-faint); font-weight:600; margin-top:2px; }
+
+.concept-footer{ text-align:center; padding: 90px 0 70px; }
+.concept-flow{ display:flex; align-items:center; justify-content:center; gap:18px; flex-wrap:wrap; font-size: clamp(20px,4vw,30px); font-weight:800; margin-bottom:18px; }
+.concept-caption{ color:var(--ink-faint); font-size:13px; font-weight:600; font-family:ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace; }
+.footer-disclaimer{ color:var(--ink-faint); font-size:11.5px; font-weight:500; margin-top: 14px; line-height:1.6; }
+
+.state-pill{ display:inline-block; font-size:9.5px; font-weight:800; padding:2px 7px; border-radius:20px; margin-left:4px; color: var(--ink-faint); background: var(--tint-05); border:1px solid var(--line-strong); }
+.state-pill.is-bought{ color: var(--blue); border-color: var(--blue); }
+.legend{ font-size:12px; color:var(--ink-soft); line-height:1.75; margin-top:18px; }
+.budget-note{ font-size:12px; color:var(--ink-faint); line-height:1.7; margin-top:16px; }
+.tool-row{ display:flex; flex-wrap:wrap; align-items:center; gap:12px 18px; margin-top:20px; }
+.asof{ display:inline-flex; align-items:center; gap:8px; font-size:12px; font-weight:700; color:var(--ink-soft); }
+.asof input[type="date"]{ font: inherit; font-size:12.5px; background: var(--glass-strong); border:1px solid var(--line-strong); border-radius:10px; padding:6px 10px; color-scheme: light dark; }
+.btn-ghost{ font: inherit; font-size:12px; font-weight:700; cursor:pointer; background: var(--glass); border:1px solid var(--line-strong); border-radius:20px; padding:7px 14px; }
+.btn-ghost.is-armed{ color:#fff; background: var(--pink); border-color: var(--pink); }
+.notice{ margin-top:14px; padding:10px 14px; border-radius:12px; font-size:12px; font-weight:600; color: var(--ink-soft); background: var(--tint-05); border:1px solid var(--line-strong); }
+.notice[hidden]{ display:none; }
+.notice.warn{ color: var(--amber); background: var(--amber-bg); border-color: var(--amber-border); }
+.notice.error{ color: var(--pink); border-color: var(--pink); }
+.spoke-note{ font-size:9.5px; font-weight:600; color:var(--ink-faint); }
+.acc-price{ font-size:10px; color:var(--amber); font-weight:700; }
+.disposal-check{ display:inline-flex; align-items:center; gap:6px; margin-top:4px; font-size:11.5px; font-weight:700; cursor:pointer; }
+.dispose-input{ width:15px; height:15px; accent-color: var(--green); cursor:pointer; }
+
+@media (max-width: 720px){
+  .checklist{ grid-template-columns: 1fr; }
+  .budget-grid{ grid-template-columns: repeat(2,1fr); }
+  .compare{ grid-template-columns: 1fr; }
+  .compare-arrow{ margin: 0 auto; transform: rotate(90deg); }
+  .acc-grid{ grid-template-columns: repeat(2,1fr); }
+  .device-grid{ grid-template-columns: 1fr; }
+  section{ padding: 60px 0; }
+}
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">本文へスキップ</a>
+
+<svg style="position:absolute; width:0; height:0; overflow:hidden" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="ic-phone" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2.6"/><line x1="10" y1="19" x2="14" y2="19"/></symbol>
+    <symbol id="ic-tablet" viewBox="0 0 24 24"><rect x="3" y="2" width="18" height="20" rx="2.6"/><line x1="10" y1="19" x2="14" y2="19"/></symbol>
+    <symbol id="ic-watch" viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="2.6"/><path d="M9 7V4.2A1.2 1.2 0 0 1 10.2 3h3.6A1.2 1.2 0 0 1 15 4.2V7"/><path d="M9 17v2.8A1.2 1.2 0 0 0 10.2 21h3.6a1.2 1.2 0 0 0 1.2-1.2V17"/><line x1="17.3" y1="10.6" x2="19" y2="10.6"/></symbol>
+    <symbol id="ic-headphones" viewBox="0 0 24 24"><path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="2.4" y="14" width="4.2" height="6.5" rx="1.6"/><rect x="17.4" y="14" width="4.2" height="6.5" rx="1.6"/></symbol>
+    <symbol id="ic-gamepad" viewBox="0 0 24 24"><rect x="2" y="8" width="20" height="9" rx="4.2"/><line x1="7" y1="10.3" x2="7" y2="14.7"/><line x1="4.8" y1="12.5" x2="9.2" y2="12.5"/><circle cx="16" cy="10.8" r="1"/><circle cx="18.6" cy="13.4" r="1"/></symbol>
+    <symbol id="ic-tv" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="14" rx="2.2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="18" x2="12" y2="21"/></symbol>
+    <symbol id="ic-battery" viewBox="0 0 24 24"><rect x="2" y="7" width="17" height="10" rx="2.2"/><line x1="21.3" y1="10.2" x2="21.3" y2="13.8"/><rect x="4.2" y="9.2" width="7.6" height="5.6" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="ic-plug" viewBox="0 0 24 24"><path d="M9 3v5.5M15 3v5.5M6 8.5h12l-.9 4.6a5.1 5.1 0 0 1-10.2 0z"/><line x1="12" y1="17.5" x2="12" y2="21"/></symbol>
+    <symbol id="ic-cable" viewBox="0 0 24 24"><path d="M4 5c4.2 0 4.2 4 8 4s3.8-4 8-4"/><path d="M4 19c4.2 0 4.2-4 8-4s3.8 4 8 4"/><circle cx="4" cy="5" r="1.5" fill="currentColor" stroke="none"/><circle cx="20" cy="19" r="1.5" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="ic-shield" viewBox="0 0 24 24"><path d="M12 2.5l7.5 2.8v5.4c0 4.8-3.2 8-7.5 10.3-4.3-2.3-7.5-5.5-7.5-10.3V5.3z"/></symbol>
+    <symbol id="ic-film" viewBox="0 0 24 24"><path d="M13.5 2H6.2A2.2 2.2 0 0 0 4 4.2v15.6A2.2 2.2 0 0 0 6.2 22h11.6a2.2 2.2 0 0 0 2.2-2.2V8.2z"/><path d="M13.5 2v6.2h6.5"/></symbol>
+  </defs>
+</svg>
+
+<div class="scroll-progress" aria-hidden="true"><div class="scroll-progress-fill" id="scrollProgressFill"></div></div>
+
+<nav class="site-nav" id="siteNav" aria-label="セクションナビゲーション">
+  <div class="site-nav-inner">
+    <a href="#sec-timeline" data-nav="sec-timeline">Timeline</a>
+    <a href="#sec-budget" data-nav="sec-budget">Budget</a>
+    <a href="#sec-progress" data-nav="sec-progress">Progress</a>
+    <a href="#sec-checklist" data-nav="sec-checklist">Checklist</a>
+    <a href="#sec-network" data-nav="sec-network">Ecosystem</a>
+    <a href="#sec-compare" data-nav="sec-compare">Compare</a>
+    <a href="#sec-owned" data-nav="sec-owned">Owned</a>
+    <a href="#sec-acc" data-nav="sec-acc">Accessories</a>
+  </div>
+</nav>
+
+<div class="wrap">
+  <header class="hero fade-in">
+    <p class="eyebrow">Device Ecosystem Roadmap</p>
+    <h1 class="hero-title">2027年から始まる、<br><span class="accent">デバイスエコシステム</span>の完成へ。</h1>
+    <p class="hero-sub">音環境から作業環境、そして連携の完成へ。体験の質を上げる順に組んだ、購入計画。</p>
+    <div class="hero-stats">
+      <div class="hero-stat glass rounded-md"><p class="k">Total Budget(本体)</p><p class="v" data-hero="total" data-count-to="142940" data-count-prefix="¥">¥142,940</p></div>
+      <div class="hero-stat glass rounded-md"><p class="k">Purchases</p><p class="v"><span data-device-count>3</span> <span>devices</span></p></div>
+      <div class="hero-stat glass rounded-md"><p class="k">Timeline</p><p class="v">2027</p></div>
+    </div>
+  </header>
+
+  <main id="main">
+    <section id="sec-timeline" class="fade-in">
+      <p class="eyebrow">Timeline</p>
+      <h2 class="section-title">年ごとのロードマップ</h2>
+      <p class="section-sub">2027年中に、体験・作業・連携の順に投資していく計画。</p>
+      <div class="year-track">
+        <div class="year-col glass rounded-lg" style="--yc:var(--indigo)">
+          <p class="year-num">2027</p>
+          <p class="year-tag">Phase 1 · 体験+連携の想定</p>
+          <div class="year-item" data-sync="redmi-buds8pro">
+            <span class="year-dot" aria-hidden="true"></span>
+            <div>
+              <p class="year-item-name">REDMI Buds 8 Pro<span class="state-pill" data-pill>購入予定</span></p>
+              <p class="year-item-price" data-price-for="redmi-buds8pro" data-fmt="short">¥9,980 ・ 前半</p>
+            </div>
+          </div>
+          <div class="year-item" data-sync="pad8">
+            <span class="year-dot" aria-hidden="true"></span>
+            <div>
+              <p class="year-item-name">Xiaomi Pad 8<span class="state-pill" data-pill>購入予定</span></p>
+              <p class="year-item-price" data-price-for="pad8" data-fmt="short">¥74,980 ・ 前半</p>
+            </div>
+          </div>
+          <div class="year-item" data-sync="redmi-note15pro">
+            <span class="year-dot" aria-hidden="true"></span>
+            <div>
+              <p class="year-item-name">REDMI Note 15 Pro 5G<span class="state-pill" data-pill>購入予定</span></p>
+              <p class="year-item-price" data-price-for="redmi-note15pro" data-fmt="short">¥57,980 ・ 後半</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="sec-budget" class="fade-in">
+      <p class="eyebrow">Budget</p>
+      <h2 class="section-title">予算管理</h2>
+      <p class="section-sub">本体3製品の予算です。アクセサリー・小物は別枠で、ここには含みません。</p>
+      <div class="budget-grid">
+        <div class="budget-tile glass rounded-lg"><p class="k">本体 総予算</p><p class="v" data-budget="total" data-count-to="142940" data-count-prefix="¥">¥142,940</p></div>
+        <div class="budget-tile glass rounded-lg accent"><p class="k">購入済み金額</p><p class="v" data-budget="purchased">¥0</p></div>
+        <div class="budget-tile glass rounded-lg"><p class="k">未購入の残額</p><p class="v" data-budget="remaining">¥142,940</p></div>
+        <div class="budget-tile glass rounded-lg"><p class="k">購入済み台数</p><p class="v" data-budget="count">0 / 3台</p></div>
+        <div class="budget-tile glass rounded-lg accent"><p class="k">購入台数ベース進捗</p><p class="v" data-budget="count-rate">0%</p></div>
+        <div class="budget-tile glass rounded-lg accent"><p class="k">金額ベース進捗</p><p class="v" data-budget="amount-rate">0%</p></div>
+      </div>
+      <div class="notice error" id="budgetAlert" role="alert" hidden></div>
+    </section>
+
+    <section id="sec-progress" class="fade-in">
+      <p class="eyebrow">Progress</p>
+      <h2 class="section-title">計画の進捗</h2>
+      <div class="progress-wrap glass rounded-lg">
+        <div class="progress-track" role="progressbar" id="progressTrack"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="progress-labels" id="progressLabels"></div>
+        <p class="progress-next" id="progressNext"></p>
+      </div>
+    </section>
+
+    <section id="sec-checklist" class="fade-in">
+      <p class="eyebrow">Checklist</p>
+      <h2 class="section-title">購入チェックリスト</h2>
+      <p class="checklist-summary" id="checklistSummary">0 / 3 購入済み</p>
+      <div class="checklist" id="checklist" data-budget-cap="142940">
+        <label class="check-item glass rounded-md liftable" style="--item-color:var(--blue)" data-price="9980" data-sync="redmi-buds8pro" data-name="REDMI Buds 8 Pro" data-year="2027" data-term="前半">
+          <input type="checkbox" class="check-input">
+          <span class="check-box-visual"></span>
+          <span class="check-icon"><svg viewBox="0 0 24 24"><use href="#ic-headphones"/></svg></span>
+          <span class="check-content"><span class="check-name">REDMI Buds 8 Pro<span class="state-pill" data-pill>購入予定</span></span><span class="check-meta" data-price-for="redmi-buds8pro" data-fmt="long">¥9,980 ・ 2027年前半</span></span>
+        </label>
+        <label class="check-item glass rounded-md liftable" style="--item-color:var(--indigo)" data-price="74980" data-sync="pad8" data-name="Xiaomi Pad 8" data-year="2027" data-term="前半">
+          <input type="checkbox" class="check-input">
+          <span class="check-box-visual"></span>
+          <span class="check-icon"><svg viewBox="0 0 24 24"><use href="#ic-tablet"/></svg></span>
+          <span class="check-content"><span class="check-name">Xiaomi Pad 8<span class="state-pill" data-pill>購入予定</span></span><span class="check-meta" data-price-for="pad8" data-fmt="long">¥74,980 ・ 2027年前半</span></span>
+        </label>
+        <label class="check-item glass rounded-md liftable" style="--item-color:var(--amber)" data-price="57980" data-sync="redmi-note15pro" data-name="REDMI Note 15 Pro 5G" data-year="2027" data-term="後半">
+          <input type="checkbox" class="check-input">
+          <span class="check-box-visual"></span>
+          <span class="check-icon"><svg viewBox="0 0 24 24"><use href="#ic-phone"/></svg></span>
+          <span class="check-content"><span class="check-name">REDMI Note 15 Pro 5G<span class="state-pill" data-pill>購入予定</span></span><span class="check-meta" data-price-for="redmi-note15pro" data-fmt="long">¥57,980 ・ 2027年後半</span></span>
+        </label>
+      </div>
+      <div class="tool-row">
+        <label class="asof" for="asOfInput">基準日 <input type="date" id="asOfInput"></label>
+        <span class="asof-text" id="asOfText"></span>
+        <button type="button" class="btn-ghost" id="resetBtn">購入状況をリセット</button>
+      </div>
+      <p class="notice" id="storageNotice">保存機能を確認中です…</p>
+      <p class="notice warn" id="loadNotice" hidden></p>
+    </section>
+
+    <section class="fade-in celebrate-section" id="celebrateSection">
+      <div class="celebrate glass rounded-lg" id="celebrate" hidden>
+        <p class="celebrate-emoji">🎉</p>
+        <h2 class="celebrate-title">購入完了</h2>
+        <p class="celebrate-sub" id="celebrateSub"></p>
+      </div>
+    </section>
+
+    <section id="sec-network" class="fade-in">
+      <p class="eyebrow">Ecosystem</p>
+      <h2 class="section-title">完成後のデバイスエコシステム</h2>
+      <div class="network-card glass rounded-lg">
+        <div class="hub-node"><span class="hub-icon"><svg viewBox="0 0 24 24"><use href="#ic-phone"/></svg></span><span class="hub-label">iPhone 16</span><span class="hub-sublabel">ハブ</span></div>
+        <div class="hub-connector"></div>
+        <div class="spoke-grid">
+          <div class="spoke-item" style="--nc:var(--blue);"><span class="spoke-icon"><svg viewBox="0 0 24 24"><use href="#ic-headphones"/></svg></span><span class="spoke-label">REDMI Buds 8 Pro</span></div>
+          <div class="spoke-item" style="--nc:var(--indigo);"><span class="spoke-icon"><svg viewBox="0 0 24 24"><use href="#ic-tablet"/></svg></span><span class="spoke-label">Xiaomi Pad 8</span></div>
+          <div class="spoke-item" style="--nc:var(--amber);"><span class="spoke-icon"><svg viewBox="0 0 24 24"><use href="#ic-phone"/></svg></span><span class="spoke-label">REDMI Note 15 Pro</span></div>
+          <div class="spoke-item" style="--nc:var(--green);"><span class="spoke-icon"><svg viewBox="0 0 24 24"><use href="#ic-gamepad"/></svg></span><span class="spoke-label">Switch 2</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="sec-compare" class="fade-in">
+      <p class="eyebrow">Before / After</p>
+      <h2 class="section-title">現在と完成後の比較</h2>
+      <div class="compare">
+        <div class="compare-col glass rounded-lg">
+          <p class="compare-title now">現在</p>
+          <p class="compare-row">📱 iPhone 16</p>
+          <p class="compare-row">📱 iPhone 11</p>
+          <p class="compare-row">🎧 Anker P40i</p>
+          <p class="compare-row dim">📲 iPad 第10世代</p>
+          <p class="compare-row">📲 iPad(A16)</p>
+          <p class="compare-row">🎮 Switch 2</p>
+        </div>
+        <div class="compare-arrow">→</div>
+        <div class="compare-col glass rounded-lg">
+          <p class="compare-title after">完成後</p>
+          <p class="compare-row">📱 iPhone 16</p>
+          <p class="compare-row">📱 REDMI Note 15 Pro 5G</p>
+          <p class="compare-row">🎧 REDMI Buds 8 Pro</p>
+          <p class="compare-row">📲 Xiaomi Pad 8</p>
+          <p class="compare-row">📲 iPad(A16)</p>
+          <p class="compare-row">🎮 Switch 2</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="sec-owned" class="fade-in">
+      <p class="eyebrow">Currently Owned</p>
+      <h2 class="section-title">現在所有デバイス</h2>
+      <div class="device-grid">
+        <div class="device-card glass rounded-md"><span class="device-icon"><svg viewBox="0 0 24 24"><use href="#ic-phone"/></svg></span><div><p class="device-name">iPhone 16</p><p class="device-role">メイン</p></div></div>
+        <div class="device-card glass rounded-md"><span class="device-icon"><svg viewBox="0 0 24 24"><use href="#ic-phone"/></svg></span><div><p class="device-name">iPhone 11</p><p class="device-role">サブ(処分予定)</p></div></div>
+      </div>
+    </section>
+
+    <section id="sec-acc" class="fade-in">
+      <p class="eyebrow">Small Purchases</p>
+      <h2 class="section-title">細かいデバイス計画</h2>
+      <div class="acc-grid">
+        <div class="acc-item glass rounded-md"><span class="acc-icon"><svg viewBox="0 0 24 24"><use href="#ic-battery"/></svg></span><p class="acc-name">モバイルバッテリー</p></div>
+        <div class="acc-item glass rounded-md"><span class="acc-icon"><svg viewBox="0 0 24 24"><use href="#ic-plug"/></svg></span><p class="acc-name">USB-C充電器</p></div>
+        <div class="acc-item glass rounded-md"><span class="acc-icon"><svg viewBox="0 0 24 24"><use href="#ic-cable"/></svg></span><p class="acc-name">USB-Cケーブル</p></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="concept-footer fade-in">
+    <p class="concept-flow"><span>体験</span><span>→</span><span>作業環境</span><span>→</span><span>連携完成</span></p>
+    <p class="concept-caption">DEVICE ECOSYSTEM ROADMAP</p>
+  </footer>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var fadeTargets = document.querySelectorAll('.fade-in');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) { entry.target.classList.add('in-view'); io.unobserve(entry.target); }
+      });
+    }, { threshold: 0.15 });
+    fadeTargets.forEach(function (el) { io.observe(el); });
+  } else { fadeTargets.forEach(function (el) { el.classList.add('in-view'); }); }
+
+  try {
+    var STORAGE_KEY = 'deviceMap.purchaseState';
+    var STATE_VERSION = 1;
+    var checklistEl = document.getElementById('checklist');
+    var items = Array.prototype.slice.call(checklistEl.querySelectorAll('.check-item')).map(function (label) {
+      return { id: label.dataset.sync, name: label.dataset.name, term: label.dataset.year + '年' + label.dataset.term, shortTerm: label.dataset.term, price: Number(label.dataset.price), input: label.querySelector('.check-input') };
+    });
+    var disposals = Array.prototype.slice.call(document.querySelectorAll('[data-dispose]')).map(function (li) {
+      return { id: li.dataset.dispose, input: li.querySelector('.dispose-input'), pill: li.querySelector('[data-dpill]') };
+    });
+
+    var el = function (sel) { return document.querySelector(sel); };
+    var tile = function (key) { return el('[data-budget="' + key + '"]'); };
+    var progressFill = document.getElementById('progressFill');
+    var progressTrack = document.getElementById('progressTrack');
+    var progressLabels = document.getElementById('progressLabels');
+    var progressNext = document.getElementById('progressNext');
+    var celebrate = document.getElementById('celebrate');
+    var celebrateSection = document.getElementById('celebrateSection');
+    var celebrateSub = document.getElementById('celebrateSub');
+    var checklistSummary = document.getElementById('checklistSummary');
+    var budgetAlert = document.getElementById('budgetAlert');
+    var asOfInput = document.getElementById('asOfInput');
+    var asOfText = document.getElementById('asOfText');
+    var resetBtn = document.getElementById('resetBtn');
+    var storageNotice = document.getElementById('storageNotice');
+    var loadNotice = document.getElementById('loadNotice');
+
+    var formatYen = function (n) { return '¥' + n.toLocaleString('ja-JP'); };
+    var todayStr = function () { var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); };
+
+    var totalBudget = items.reduce(function (sum, it) { return sum + it.price; }, 0);
+    tile('total').textContent = formatYen(totalBudget);
+
+    var buildMarks = function () {
+      while (progressLabels.firstChild) progressLabels.removeChild(progressLabels.firstChild);
+      for (var k = 0; k <= items.length; k++) {
+        var mark = document.createElement('div'); mark.className = 'p-mark';
+        var dot = document.createElement('span'); dot.className = 'p-dot';
+        var pct = document.createElement('p'); pct.className = 'p-pct'; pct.textContent = Math.round((k / items.length) * 100) + '%';
+        var lab = document.createElement('p'); lab.className = 'p-label'; lab.textContent = k === 0 ? '0台' : k + '台';
+        mark.appendChild(dot); mark.appendChild(pct); mark.appendChild(lab);
+        progressLabels.appendChild(mark);
+      }
+    };
+    buildMarks();
+    var marks = Array.prototype.slice.call(progressLabels.querySelectorAll('.p-mark'));
+
+    var storage = null, storageOk = false;
+    try { storage = window.localStorage; storage.setItem('__probe__', '1'); storage.removeItem('__probe__'); storageOk = true; } catch (e) { storageOk = false; }
+
+    var save = function () {
+      if (!storageOk) return;
+      try {
+        storage.setItem(STORAGE_KEY, JSON.stringify({
+          v: STATE_VERSION,
+          purchased: items.filter(function (it) { return it.input.checked; }).map(function (it) { return it.id; })
+        }));
+      } catch (e) {}
+    };
+
+    var load = function () {
+      if (!storageOk) return;
+      var raw = storage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      var data = JSON.parse(raw);
+      var byId = {}; items.forEach(function (it) { byId[it.id] = it; });
+      (data.purchased || []).forEach(function (id) { if (byId[id]) byId[id].input.checked = true; });
+    };
+
+    var update = function () {
+      var bought = items.filter(function (it) { return it.input.checked; });
+      var count = bought.length;
+      var purchased = bought.reduce(function (sum, it) { return sum + it.price; }, 0);
+      var remaining = totalBudget - purchased;
+      var countPct = Math.round((count / items.length) * 100);
+      var amountPct = Math.round((purchased / totalBudget) * 100);
+
+      tile('purchased').textContent = formatYen(purchased);
+      tile('remaining').textContent = formatYen(remaining);
+      tile('count').textContent = count + ' / ' + items.length + '台';
+      tile('count-rate').textContent = countPct + '%';
+      tile('amount-rate').textContent = amountPct + '%';
+
+      progressFill.style.width = countPct + '%';
+      marks.forEach(function (mark, i) { mark.classList.toggle('active', i <= count); });
+
+      items.forEach(function (it) {
+        var done = it.input.checked;
+        var label = it.input.closest('.check-item');
+        var pill = label.querySelector('[data-pill]');
+        pill.textContent = done ? '購入済み' : '購入予定';
+        pill.classList.toggle('is-bought', done);
+        var row = document.querySelector('.year-item[data-sync="' + it.id + '"]');
+        if (row) {
+          row.classList.toggle('is-done', done);
+          var rowPill = row.querySelector('[data-pill]');
+          if (rowPill) { rowPill.textContent = done ? '購入済み' : '購入予定'; rowPill.classList.toggle('is-bought', done); }
+        }
+      });
+
+      checklistSummary.textContent = count + ' / ' + items.length + ' 購入済み';
+      
+      var pending = items.filter(function (it) { return !it.input.checked; });
+      if (pending.length) {
+        progressNext.textContent = '未購入: ' + pending.map(function(it){ return it.name; }).join(', ');
+      } else {
+        progressNext.textContent = '購入完了 🎉';
+      }
+
+      var complete = count === items.length;
+      celebrate.hidden = !complete;
+      celebrateSection.classList.toggle('is-visible', complete);
+      celebrateSub.textContent = '3台すべてが購入済みになりました！';
+    };
+
+    items.forEach(function (it) {
+      it.input.addEventListener('change', function () { update(); save(); });
+    });
+
+    resetBtn.addEventListener('click', function () {
+      items.forEach(function (it) { it.input.checked = false; });
+      if (storageOk) storage.removeItem(STORAGE_KEY);
+      update();
+    });
+
+    storageNotice.textContent = storageOk ? 'ブラウザに自動保存されます。' : '保存機能は使えません。';
+    load();
+    update();
+  } catch (err) { console.error(err); }
+})();
+</script>
+</body>
+</html>
